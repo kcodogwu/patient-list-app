@@ -14,13 +14,53 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JTextArea;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.DefaultComboBoxModel;
 
 public class MainWindow {
-
 	private JFrame frame;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
+	private JTextField txtName;
+	private JTextField txtPhoneNumber;
+	private JTextField txtEmail;
+	private JMenuBar menuBar;
+	private JMenu mnMenu;
+	private JMenuItem mntmList;
+	private JMenuItem mntmNewPatient;
+	private JMenuItem mntmExit;
+	private JPanel panel;
+	private JLabel lblPatientList;
+	private JLabel lbl1;
+	private JLabel lbl2;
+	private JLabel lbl3;
+	private JLabel lbl4;
+	private JLabel lbl5;
+	private JComboBox comboBox = new JComboBox();
+	private JButton button;
+	private JButton btnNext;
+	private JButton btnNew;
+	private JButton btnAdmit;
+	private JButton btnRelease;
+	private JLabel lblPatientName;
+	private JLabel lblNumberOfAppointments;
+	private JLabel lblNumberOfAdmissions;
+	private JLabel lblIsOnAdmission;
+	private JPanel panel_1;
+	private JLabel lblNewPatient;
+	private JLabel lblName;
+	private JLabel lblPhoneNumber;
+	private JLabel lblEmail;
+	private JLabel lblAddress;
+	private JButton btnAddPatient;
+	private JButton btnCancel;
+	private JTextArea txtAddress;
+	private PatientArrayList paList = new PatientArrayList(1000);
+	private DefaultComboBoxModel model;
+	private String[] cbItems;
+	final static String PATIENT_LIST = "PATIENT_LIST";
+	final static String NEW_PATIENT = "NEW_PATIENT";
+	private int patientIndex = 0;
+	private int patientCount = 0;
 
 	/**
 	 * Launch the application.
@@ -50,158 +90,304 @@ public class MainWindow {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
-		
-		JMenu mnMenu = new JMenu("Menu");
-		menuBar.add(mnMenu);
-		
-		JMenuItem mntmList = new JMenuItem("List");
-		mnMenu.add(mntmList);
-		
-		JMenuItem mntmNewPatient = new JMenuItem("New Patient");
-		mnMenu.add(mntmNewPatient);
-		
-		JMenuItem mntmExit = new JMenuItem("Exit");
-		mnMenu.add(mntmExit);
+		frame.setBounds(100, 100, 460, 500);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(new CardLayout(0, 0));
 		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, "name_262852550863755");
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		mnMenu = new JMenu("Menu");
+		menuBar.add(mnMenu);
+		
+		mntmList = new JMenuItem("List");
+		
+		mntmList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) frame.getContentPane().getLayout();
+				
+				reloadComboBox();
+				if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+				cl.show(frame.getContentPane(), PATIENT_LIST);
+			}
+		});
+		
+		mnMenu.add(mntmList);
+		
+		mntmNewPatient = new JMenuItem("New Patient");
+		
+		mntmNewPatient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) frame.getContentPane().getLayout();
+				cl.show(frame.getContentPane(), NEW_PATIENT);
+			}
+		});
+		
+		mnMenu.add(mntmNewPatient);
+		
+		mntmExit = new JMenuItem("Exit");
+		
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		
+		mnMenu.add(mntmExit);
+		
+		panel = new JPanel();
+		frame.getContentPane().add(panel, PATIENT_LIST);
 		panel.setLayout(null);
 		
-		JLabel lblPatientList = new JLabel("Patient List");
+		lblPatientList = new JLabel("Patient List");
 		lblPatientList.setBounds(152, 11, 147, 37);
 		lblPatientList.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		panel.add(lblPatientList);
 		
-		JLabel lbl1 = new JLabel("Patient Number:");
+		lbl1 = new JLabel("Patient Number:");
 		lbl1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lbl1.setBounds(33, 102, 122, 14);
 		panel.add(lbl1);
 		
-		JLabel lbl2 = new JLabel("Patient Name:");
+		lbl2 = new JLabel("Patient Name:");
 		lbl2.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lbl2.setBounds(33, 145, 106, 14);
 		panel.add(lbl2);
 		
-		JLabel lbl3 = new JLabel("Number of appointments:");
+		lbl3 = new JLabel("Number of appointments:");
 		lbl3.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lbl3.setBounds(33, 184, 171, 14);
 		panel.add(lbl3);
 		
-		JLabel lbl4 = new JLabel("Number of admissions:");
+		lbl4 = new JLabel("Number of admissions:");
 		lbl4.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lbl4.setBounds(33, 223, 156, 14);
 		panel.add(lbl4);
 		
-		JLabel lbl5 = new JLabel("Is on admission?");
+		lbl5 = new JLabel("Is on admission?");
 		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lbl5.setBounds(33, 261, 111, 14);
 		panel.add(lbl5);
+
+		reloadComboBox();
 		
-		JComboBox comboBox = new JComboBox();
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JComboBox cb = (JComboBox) e.getSource();
+				
+				patientIndex = cb.getSelectedIndex();
+				if (patientCount > 0) showPatientDetails(patientIndex);
+			}
+		});
+
 		comboBox.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		comboBox.setBounds(205, 99, 106, 20);
 		panel.add(comboBox);
 		
-		JButton button = new JButton("<< Previous");
+		button = new JButton("<< Previous");
+		
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (patientIndex - 1 > -1) {
+					--patientIndex;
+					if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+				}
+			}
+		});
+		
 		button.setBounds(66, 54, 106, 23);
 		panel.add(button);
 		
-		JButton btnNext = new JButton("Next >>");
+		btnNext = new JButton("Next >>");
+		
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (patientIndex + 1 < patientCount) {
+					++patientIndex;
+					if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+				}
+			}
+		});
+		
 		btnNext.setBounds(260, 54, 89, 23);
 		panel.add(btnNext);
 		
-		JButton btnNew = new JButton("New appointment");
-		btnNew.setBounds(26, 338, 123, 23);
+		btnNew = new JButton("New appointment");
+		
+		btnNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				patientIndex = comboBox.getSelectedIndex();
+				Patient aPatient = paList.getPatient(patientIndex);
+				
+				aPatient.newAppointment();
+				if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+			}
+		});
+		
+		btnNew.setBounds(10, 338, 135, 23);
 		panel.add(btnNew);
 		
-		JButton btnAdmit = new JButton("Admit");
-		btnAdmit.setBounds(157, 338, 123, 23);
+		btnAdmit = new JButton("Admit");
+		
+		btnAdmit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				patientIndex = comboBox.getSelectedIndex();
+				Patient aPatient = paList.getPatient(patientIndex);
+				
+				aPatient.admit();
+				if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+			}
+		});
+		
+		btnAdmit.setBounds(154, 338, 135, 23);
 		panel.add(btnAdmit);
 		
-		JButton btnRelease = new JButton("Release");
-		btnRelease.setBounds(290, 338, 123, 23);
+		btnRelease = new JButton("Release");
+		
+		btnRelease.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				patientIndex = comboBox.getSelectedIndex();
+				Patient aPatient = paList.getPatient(patientIndex);
+				
+				aPatient.release();
+				if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+			}
+		});
+		
+		btnRelease.setBounds(299, 338, 135, 23);
 		panel.add(btnRelease);
 		
-		JLabel lblPatientName = new JLabel("-");
+		lblPatientName = new JLabel("-");
 		lblPatientName.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblPatientName.setBounds(205, 145, 106, 14);
 		panel.add(lblPatientName);
 		
-		JLabel lblNumberOfAppointments = new JLabel("-");
+		lblNumberOfAppointments = new JLabel("-");
 		lblNumberOfAppointments.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNumberOfAppointments.setBounds(205, 186, 106, 14);
 		panel.add(lblNumberOfAppointments);
 		
-		JLabel lblNumberOfAdmissions = new JLabel("-");
+		lblNumberOfAdmissions = new JLabel("-");
 		lblNumberOfAdmissions.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNumberOfAdmissions.setBounds(205, 225, 106, 14);
 		panel.add(lblNumberOfAdmissions);
 		
-		JLabel lblIsOnAdmission = new JLabel("-");
+		lblIsOnAdmission = new JLabel("-");
 		lblIsOnAdmission.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblIsOnAdmission.setBounds(205, 261, 106, 14);
 		panel.add(lblIsOnAdmission);
 		
-		JPanel panel_1 = new JPanel();
-		frame.getContentPane().add(panel_1, "name_262855384487829");
+		panel_1 = new JPanel();
+		frame.getContentPane().add(panel_1, NEW_PATIENT);
 		panel_1.setLayout(null);
 		
-		JLabel lblNewPatient = new JLabel("New Patient");
+		lblNewPatient = new JLabel("New Patient");
 		lblNewPatient.setBounds(137, 11, 160, 37);
 		lblNewPatient.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		panel_1.add(lblNewPatient);
 		
-		JLabel lblName = new JLabel("Name:");
+		lblName = new JLabel("Name:");
 		lblName.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblName.setBounds(34, 73, 61, 14);
 		panel_1.add(lblName);
 		
-		JLabel lblPhoneNumber = new JLabel("Phone number:");
+		lblPhoneNumber = new JLabel("Phone number:");
 		lblPhoneNumber.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblPhoneNumber.setBounds(34, 112, 96, 14);
 		panel_1.add(lblPhoneNumber);
 		
-		JLabel lblEmail = new JLabel("Email:");
+		lblEmail = new JLabel("Email:");
 		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblEmail.setBounds(34, 152, 44, 14);
 		panel_1.add(lblEmail);
 		
-		JLabel lblAddress = new JLabel("Address:");
+		lblAddress = new JLabel("Address:");
 		lblAddress.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblAddress.setBounds(34, 200, 61, 14);
 		panel_1.add(lblAddress);
 		
-		JButton button_1 = new JButton("New appointment");
-		button_1.setBounds(61, 368, 123, 23);
-		panel_1.add(button_1);
+		btnAddPatient = new JButton("Add patient");
 		
-		JButton button_2 = new JButton("New appointment");
-		button_2.setBounds(244, 368, 123, 23);
-		panel_1.add(button_2);
+		btnAddPatient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean flag = paList.addPatient(
+					txtName.getText(), 
+					txtPhoneNumber.getText(), 
+					txtEmail.getText(), 
+					txtAddress.getText()
+				);
+				
+				if (flag) {
+					// clear error message
+				} else {
+					// show error message
+				}
+				
+				txtName.setText("");
+				txtPhoneNumber.setText("");
+				txtEmail.setText("");
+				txtAddress.setText("");
+			}
+		});
 		
-		textField = new JTextField();
-		textField.setBounds(166, 72, 216, 20);
-		panel_1.add(textField);
-		textField.setColumns(10);
+		btnAddPatient.setBounds(61, 368, 123, 23);
+		panel_1.add(btnAddPatient);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(166, 111, 216, 20);
-		panel_1.add(textField_1);
+		btnCancel = new JButton("Cancel");
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(166, 151, 216, 20);
-		panel_1.add(textField_2);
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) frame.getContentPane().getLayout();
+				
+				reloadComboBox();
+				if (patientCount > 0) comboBox.setSelectedIndex(patientIndex);
+				cl.show(frame.getContentPane(), PATIENT_LIST);
+			}
+		});
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(166, 197, 216, 143);
-		panel_1.add(textArea);
+		btnCancel.setBounds(244, 368, 123, 23);
+		panel_1.add(btnCancel);
+		
+		txtName = new JTextField();
+		txtName.setBounds(166, 72, 216, 20);
+		panel_1.add(txtName);
+		txtName.setColumns(10);
+		
+		txtPhoneNumber = new JTextField();
+		txtPhoneNumber.setColumns(10);
+		txtPhoneNumber.setBounds(166, 111, 216, 20);
+		panel_1.add(txtPhoneNumber);
+		
+		txtEmail = new JTextField();
+		txtEmail.setColumns(10);
+		txtEmail.setBounds(166, 151, 216, 20);
+		panel_1.add(txtEmail);
+		
+		txtAddress = new JTextArea();
+		txtAddress.setBounds(166, 197, 216, 143);
+		panel_1.add(txtAddress);
+		
+		patientCount = paList.getLength();
+	}
+
+	public void showPatientDetails(int index) {
+		Patient aPatient = paList.getPatient(index);
+		
+		lblPatientName.setText(aPatient.getName());
+		lblNumberOfAppointments.setText(aPatient.getAppointments() + "");
+		lblNumberOfAdmissions.setText(aPatient.getAdmissions() + "");
+		lblIsOnAdmission.setText(aPatient.getAdmissionStatus());
+	}
+
+	public void reloadComboBox() {
+		patientCount = paList.getLength();
+		cbItems = new String[patientCount];
+		
+		for (int i = 0; i < paList.getLength(); i++) {
+			cbItems[i] = paList.getPatient(i).getName();
+		}
+		
+		model = new DefaultComboBoxModel(cbItems);
+		comboBox.setModel(model);
 	}
 }
