@@ -1,4 +1,6 @@
-public interface iPatient {
+import java.io.Serializable;
+
+public interface iPatient extends Serializable {
 	public void setPatientNumber(String aPatientNumber);
 	public String getPatientNumber();
 	public void setName(String aName);
