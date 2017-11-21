@@ -2,7 +2,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class PatientArrayList extends UnicastRemoteObject implements iPatientArrayList {
-	private Patient[] head;
+	private Patient[] store;
 	private int limit;
 	private int length = 0;
 	
@@ -12,7 +12,7 @@ public class PatientArrayList extends UnicastRemoteObject implements iPatientArr
 	
 	public PatientArrayList(int l) throws RemoteException {
 		this.limit = l;
-		this.head = new Patient[this.limit];
+		this.store = new Patient[this.limit];
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public class PatientArrayList extends UnicastRemoteObject implements iPatientArr
 			;
 			
 			temp = new Patient(aName, aPhoneNumber, anEmail, anAddress, aPatientNumber, noOfAppointments, noOfAdmissions, isAdmitted);
-			this.head[this.length] = temp;
+			this.store[this.length] = temp;
 			this.length++;
 			return true;
 		} else
@@ -46,16 +46,16 @@ public class PatientArrayList extends UnicastRemoteObject implements iPatientArr
 
 	@Override
 	public Patient getPatient(int i) throws RemoteException {
-		if (i < this.head.length)
-			return this.head[i]
+		if (i < this.store.length)
+			return this.store[i]
 		; else
-			return this.head[this.head.length - 1]
+			return this.store[this.store.length - 1]
 		;
 	}
 
 	@Override
 	public Patient[] getPatients() throws RemoteException {
-		return this.head;
+		return this.store;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class PatientArrayList extends UnicastRemoteObject implements iPatientArr
 	@Override
 	public boolean editPatientInformation(int index, Patient patient) throws RemoteException {
 		if (index < this.length) {
-			this.head[index] = patient;
+			this.store[index] = patient;
 			return true;
 		} else
 			return false

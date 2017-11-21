@@ -35,6 +35,7 @@ public class MainWindow {
 	private JMenu mnMenu;
 	private JMenuItem mntmList;
 	private JMenuItem mntmNewPatient;
+	private JMenuItem mntmAbout;
 	private JMenuItem mntmExit;
 	private JPanel panel;
 	private JLabel lblPatientList;
@@ -161,12 +162,18 @@ public class MainWindow {
 			}
 		});
 		
-		JMenuItem mntmAbout = new JMenuItem("About");
+		mntmAbout = new JMenuItem("About");
+		
 		mntmAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Patient List App\nCreated by Kingson Chinedu Odogwu\nNovember, 2017", "Information", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(
+					frmPatientList, 
+					"Patient List App\nCreated by Kingson Chinedu Odogwu\nNovember, 2017", "Information", 
+					JOptionPane.INFORMATION_MESSAGE
+				);
 			}
 		});
+		
 		mnMenu.add(mntmAbout);
 		
 		mnMenu.add(mntmExit);
@@ -412,7 +419,12 @@ public class MainWindow {
 					boolean flag;
 					
 					if (txtName.getText().equals("") || txtPhoneNumber.getText().equals("") || txtEmail.getText().equals("") || txtAddress.getText().equals("")) {
-						JOptionPane.showMessageDialog(null, "You must supply a patient's name, \nphone number, email, and address \nbefore you can add \nthe new patient record.", "Error message", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(
+							frmPatientList, 
+							"You must supply a patient's name, \nphone number, email, and address \nbefore you can add \nthe new patient record.", 
+							"Error message", 
+							JOptionPane.ERROR_MESSAGE
+						);
 					} else {
 						flag = paList.addPatient(
 							txtName.getText(), 
@@ -422,7 +434,12 @@ public class MainWindow {
 						);
 						
 						if (!flag) {
-							JOptionPane.showMessageDialog(null, "A problem occured while creating \nthe patient's record. Please contact \nthe IT administrator.", "Error message", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(
+								frmPatientList, 
+								"A problem occured while creating \nthe patient's record. Please contact \nthe IT administrator.", 
+								"Error message", 
+								JOptionPane.ERROR_MESSAGE
+							);
 						}
 						
 						txtName.setText("");
